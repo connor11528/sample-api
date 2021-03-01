@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ObservationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CapybaraController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\CapybaraController;
 
 
 Route::resource('capybaras', CapybaraController::class);
+Route::resource('observations', ObservationController::class);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

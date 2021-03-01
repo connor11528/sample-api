@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CapybaraResource;
+use App\Http\Resources\ObservationResource;
+use App\Models\Capybara;
+use App\Models\Location;
 use App\Models\Observation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ObservationController extends Controller
 {
@@ -35,7 +40,33 @@ class ObservationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
+            'capybara_name' => 'required|exists:capybaras,name',
+            'sighting_date' => 'required|date|before_or_equal:now', // cannot record sightings in the future
+            'location_name' => 'required|exists:locations,name', // must be a location name that we have on our locations.name column
+            'wearing_hat' => 'required|boolean'
+        ]);
+
+        if($validator->fails()){
+            return response(['error' => $validator->errors(), 'Validation Error']);
+        }
+
+        $location = Location::firstWhere('name', $data['location_name']);
+        $capybara = Capybara::firstWhere('name', $data['capybara_name']);
+
+        $observation = Observation::create([
+            'location_id' => $location->id,
+            'capybara_id' => $capybara->id,
+            'sighting_date' => $data['sighting_date'],
+            'wearing_hat' => $data['wearing_hat']
+        ]);
+
+        return response([
+            'observation' => new ObservationResource($observation),
+            'message' => 'Observation created successfully!'
+        ], 201);
     }
 
     /**

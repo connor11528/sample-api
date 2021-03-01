@@ -8,11 +8,13 @@ use Tests\TestCase;
 
 class CapybaraTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function create_capybara_test()
     {
         $capybaraData = [
-            "name" => "John Doe",
+            "name" => "Hydrochoerus hydrochaeris",
             "color" => "Brown",
             "size" => "Medium",
         ];

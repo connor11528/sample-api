@@ -14,6 +14,13 @@ class ObservationResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'capybara_id' => $this->capybara_id,
+            'sighting_date' => $this->sighting_date,
+            'location_id' => $this->location_id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }

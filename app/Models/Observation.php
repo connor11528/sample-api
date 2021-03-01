@@ -9,6 +9,8 @@ class Observation extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function location()
     {
         return $this->hasOne(Location::class);

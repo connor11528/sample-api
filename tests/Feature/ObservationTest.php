@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Capybara;
 use App\Models\Location;
+use App\Models\Observation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -44,4 +45,35 @@ class ObservationTest extends TestCase
                 "message"
             ]);
     }
+
+    /** @test */
+    public function test_one_capybara_per_location_per_day()
+    {
+        $location = Location::factory()->create([
+            'name' => 'San Francisco',
+        ]);
+
+        $capybara = Capybara::factory()->create([
+            'name' => 'Hydrochoerus hydrochaeris'
+        ]);
+
+        $observation1 = Observation::factory()->create([
+            'location_id' => $location->id,
+            'capybara_id' => $capybara->id,
+            'sighting_date' => now()->toDateTimeString()
+        ]);
+
+        $observationData = [
+            'capybara_name' => $capybara->name,
+            'sighting_date' => now()->toDateTimeString(),
+            'location_name' => $location->name,
+            'wearing_hat' => false
+        ];
+
+        $response = $this->json('POST', 'api/observations', $observationData, ['Accept' => 'application/json'])
+            ->assertStatus(422)
+            ->assertJsonStructure(['error']);
+    }
+
+
 }

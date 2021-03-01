@@ -8,6 +8,7 @@ use App\Models\Capybara;
 use App\Models\Location;
 use App\Models\Observation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class ObservationController extends Controller
@@ -55,6 +56,22 @@ class ObservationController extends Controller
 
         $location = Location::firstWhere('name', $data['location_name']);
         $capybara = Capybara::firstWhere('name', $data['capybara_name']);
+
+        $sightingDate = Carbon::parse($data['sighting_date']);
+
+        // check that can't see capybara in same location on same day
+        $existingObservation = Observation::whereDate('sighting_date', '=', $sightingDate->format('Y-m-d'))
+            ->where([
+                'location_id' => $location->id,
+                'capybara_id' => $capybara->id
+            ])
+            ->get();
+
+        if ($existingObservation->isNotEmpty()){
+            return response([
+                'error' => 'We have already recorded an observation of this Capybara in this location today',
+            ])->setStatusCode(422);
+        }
 
         $observation = Observation::create([
             'location_id' => $location->id,

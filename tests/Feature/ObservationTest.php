@@ -70,9 +70,71 @@ class ObservationTest extends TestCase
             'wearing_hat' => false
         ];
 
-        $response = $this->json('POST', 'api/observations', $observationData, ['Accept' => 'application/json'])
+        $this->json('POST', 'api/observations', $observationData, ['Accept' => 'application/json'])
             ->assertStatus(422)
             ->assertJsonStructure(['error']);
+    }
+
+    /** @test */
+    public function test_cannot_add_observation_for_unsupported_location()
+    {
+        $capybara = Capybara::factory()->create([
+            'name' => 'Hydrochoerus hydrochaeris'
+        ]);
+
+        // add all supported locations
+        collect(Location::ACCEPTABLE_LOCATIONS)->each(function($locationName){
+            Location::factory()->create([
+                'name' => $locationName
+            ]);
+        });
+
+        $observationData = [
+            'capybara_name' => $capybara->name,
+            'sighting_date' => now()->toDateTimeString(),
+            'location_name' => 'Los Angeles',
+            'wearing_hat' => false
+        ];
+
+        $this->json('POST', 'api/observations', $observationData, ['Accept' => 'application/json'])
+            ->assertStatus(422)
+            ->assertJsonStructure(['error']);
+    }
+
+    /** @test */
+    public function test_can_add_observation_for_supported_location()
+    {
+        $capybara = Capybara::factory()->create([
+            'name' => 'Hydrochoerus hydrochaeris'
+        ]);
+
+        // add all supported locations
+        collect(Location::ACCEPTABLE_LOCATIONS)->each(function($locationName){
+            Location::factory()->create([
+                'name' => $locationName
+            ]);
+        });
+
+        $observationData = [
+            'capybara_name' => $capybara->name,
+            'sighting_date' => now()->toDateTimeString(),
+            'location_name' => 'San Francisco',
+            'wearing_hat' => true
+        ];
+
+        $this->json('POST', 'api/observations', $observationData, ['Accept' => 'application/json'])
+            ->assertStatus(201)
+            ->assertJsonStructure([
+                'observation' => [
+                    'id' ,
+                    'capybara_id',
+                    'sighting_date',
+                    'location_id',
+                    'created_at',
+                    'updated_at',
+                ],
+                "message"
+            ]);
     }
 
 

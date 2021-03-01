@@ -11,4 +11,12 @@ class Location extends Model
 
     protected $guarded = [];
 
+    const ACCEPTABLE_LOCATIONS = [
+        'Chicago',
+        'Atlanta',
+        'New York',
+        'Houston',
+        'San Francisco'
+    ];
+
 }

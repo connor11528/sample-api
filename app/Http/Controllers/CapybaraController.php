@@ -40,13 +40,14 @@ class CapybaraController extends Controller
         $data = $request->all();
 
         $validator = Validator::make($data, [
-            'name' => 'required|max:255',
+            'name' => 'required|unique:capybaras|max:255',
             'color' => 'required|max:255',
             'size' => 'required|max:255'
         ]);
 
         if($validator->fails()){
-            return response(['error' => $validator->errors(), 'Validation Error']);
+            return response(['error' => $validator->errors(), 'Validation Error'])
+                ->setStatusCode(422);
         }
 
         $capybara = Capybara::create($data);

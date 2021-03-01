@@ -51,7 +51,8 @@ class ObservationController extends Controller
         ]);
 
         if($validator->fails()){
-            return response(['error' => $validator->errors(), 'Validation Error']);
+            return response(['error' => $validator->errors(), 'Validation Error'])
+                ->setStatusCode(422);
         }
 
         $location = Location::firstWhere('name', $data['location_name']);

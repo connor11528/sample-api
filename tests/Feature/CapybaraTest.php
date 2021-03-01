@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Capybara;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -31,6 +32,28 @@ class CapybaraTest extends TestCase
                     'updated_at'
                 ],
                 "message"
+            ]);
+    }
+
+    /** @test */
+    public function test_capybara_cannot_have_same_name()
+    {
+        $name = "Hydrochoerus hydrochaeris";
+
+        $capybara = Capybara::factory()->create([
+            'name' => $name
+        ]);
+
+        $capybaraData = [
+            "name" => $name,
+            "color" => "Brown",
+            "size" => "Medium",
+        ];
+
+        $this->json('POST', 'api/capybaras', $capybaraData, ['Accept' => 'application/json'])
+            ->assertStatus(422)
+            ->assertJsonStructure([
+                'error'
             ]);
     }
 }
